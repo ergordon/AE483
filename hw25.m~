@@ -1,0 +1,202 @@
+function hw25
+clc; clear; 
+P2
+end
+
+function P2
+
+%% Functions
+% pdot = q
+% qdot = -4*p + 4*q - 7*r - 7*cos(p)
+
+%% Step 1: Find Equillibrium
+% Change Equillibirum Point
+pe = -2;
+qe = 0;
+
+xe = [pe; qe];
+
+%%%%%%%%%%%%%%%%%%%%CHANGE THIS FUNCTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+syms r real
+re = vpa(solve(@(r) -4*pe + 4*qe - 7*r - 7*cos(pe) == 0, r));
+ue = re;
+
+disp('Step 1')
+disp(mat2str(xe))
+disp(ue)
+
+
+%% Step 2 Linearize
+
+syms q p r real
+
+%%%%%%%%%%%%%%%%%%%%CHANGE THIS FUNCTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+dp = q;
+dq = -4*p + 4*q - 7*r - 7*cos(p);
+
+xdot = [dp; dq];
+x = [p;q];
+u = [r];
+Ac = subs(jacobian(xdot,x),p,pe);
+Bc = double(jacobian(xdot,u));
+
+disp('Step 2')
+disp(mat2str(double(Ac)))
+disp(mat2str(Bc))
+
+%% Step 3: Discretize
+
+%%%%%%%%%%%%%%%%%%%%CHANGE THIS FUNCTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+dt = 0.02;
+
+Ad = double(vpa(expm(Ac*dt)));
+Bd = integral(@(tau) double(expm(Ac*tau))*Bc, 0, dt, 'ArrayValued', true);
+
+disp('Step 3')
+disp(mat2str(Ad))
+disp(mat2str(Bd))
+
+
+%% Step 4: Design Control Policy
+Q = eye(2);
+R = 1;
+
+K = dlqr(Ad,Bd,Q,R);
+disp('Step 4')
+disp(mat2str(K))
+
+%% Step 5: Implement Controly Policy (at initial time)
+%%%%%%%%%%%%%%%%%%%%CHANGE THIS FUNCTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+x0 = [-2.23;-0.06];
+
+u0 = -K*(x0-xe)+ue;
+
+disp('Step 5')
+disp(u0)
+
+%% Step 6: Implement Control Policy (at final time)
+t0 = 0;
+%%%%%%%%%%%%%%%%%%%%CHANGE THIS FUNCTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tf = 0.12; 
+
+t = t0;
+xi = x0;
+x = x0;
+
+%%%%%%%%%%%%%%%%%%%%CHANGE THIS FUNCTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%-6*p^3 - 3*p - q - 6*r
+gdot = @(t,x,u) [x(2); -6*x(1)^3 - 3*x(1) - x(2) - 6*u];
+while t<tf            
+    for i = 1:tf/dt
+            ui = [-K*(x-xe)+ue];
+    end
+    % integrate ODE's over the i'th sample interval
+    [ti_interval, xi_interval] = ode45(@(t,x) gdot(t,x,double(ui)),[t,t+dt],x);
+    x = [xi_interval(end,:)'];
+    t = [ti_interval(end)];
+end
+disp(mat2str(x))
+end
+
+function P2old
+
+g = 9.8100000000;
+m = 0.5867981454;
+J = [0.0042995428 0.0000000000 0.0000000000; 0.0000000000 0.0049829674 0.0000000000; 0.0000000000 0.0000000000 0.0064460947];
+o = [0.1224571619; 0.5339398029; 0.3270988614];
+theta1 = 0.1730807631;
+
+%% Functions
+% pdot = q
+% qdot = -4*p - 9*q - 8*r - 8*cos(p)
+
+%% Step 1: Find Equillibrium
+% Change Equillibirum Point
+pe = -1;
+qe = 0;
+
+xe = [pe; qe];
+
+% Change Equation
+syms r real
+re = vpa(solve(@(r) -4*pe - 9*qe - 8*r - 8*cos(pe) == 0, r));
+ue = re;
+
+disp('Step 1')
+disp(mat2str(xe))
+disp(ue)
+
+
+%% Step 2 Linearize
+
+syms q p r real
+
+% Change Equation
+dp = q;
+dq = -4*p - 9*q - 8*r - 8*cos(p);
+
+xdot = [dp; dq];
+x = [p;q];
+u = [r];
+Ac = subs(jacobian(xdot,x),p,pe);
+Bc = double(jacobian(xdot,u));
+
+disp('Step 2')
+disp(mat2str(double(Ac)))
+disp(mat2str(Bc))
+
+%% Step 3: Discretize
+
+% Change dt
+dt = 0.02;
+
+Ad = double(vpa(expm(Ac*dt)));
+Bd = integral(@(tau) double(expm(Ac*tau))*Bc, 0, dt, 'ArrayValued', true);
+
+disp('Step 3')
+disp(mat2str(Ad))
+disp(mat2str(Bd))
+
+
+%% Step 4: Design Control Policy
+Q = eye(2);
+R = 1;
+
+K = dlqr(Ad,Bd,Q,R);
+disp('Step 4')
+disp(mat2str(K))
+
+%% Step 5: Implement Controly Policy (at initial time)
+% Change X_0
+x0 = [-1.11; 0.25];
+u0 = -K*(x0-xe)+ue;
+
+disp('Step 5')
+disp(u0)
+
+%% Step 6: Implement Control Policy (at final time)
+t0 = 0;
+tf = 0.04;
+t = linspace(t0, tf);
+
+[t,x] = ode45(@(t,x) fdot(x,Ad,Bd,K,xe,double(ue)),t,[x0; double(u0)]);
+
+uf = x(end:end);
+xf = x(end,1:2);
+
+disp('Step 6')
+disp(mat2str(xf))
+end
+
+%{
+function xdot = gdot(xx,Ad,Bd,ui)
+    xdot = Ad*xx + Bd*ui;
+end
+%}
+function xdot = fdot(xx,Ad,Bd,K,xe,ue)
+x = [xx(1); xx(2)];
+u = [xx(3)];
+xd = Ad*x + Bd*u;
+ud = -K*(x-xe)+ue;
+xdot = [xd; ud];
+end
