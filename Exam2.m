@@ -1,9 +1,10 @@
 function Exam2
 clear; clc;
-P1
+%P1
 %[fo tau] = P2();
-P4()
-[Ac Bc] = P5();
+%P3()
+%P4();
+[Ac Bc] = P5()
 %P7(Ac, Bc);
 end
 
@@ -48,7 +49,7 @@ t1 = 0.3000000000;
     x0 = [o_1in0; theta; v_01in0; w_01in1];
        
     % Integrate Angular Rates and Euler's Equations
-    [t,x] = ode45(@(t,x) getRates(J_in1, x, u, m, g),t,x0);
+    [t,x] = ode45(@(t,x) getRates(J_in1, x, u, m, g),t,x0)
     
     q = mat2str(x(end, 1:3)')
     theta = mat2str(x(end, 4:6)')
@@ -98,8 +99,11 @@ dtheta = dx(4:6);
 dv = dx(7:9);
 dw = dx(10:12);
 
-Ac = double(vpa(subs(subs(jacobian(dx,x),x,xe),u,ue)));
-Bc = double(vpa(subs(subs(jacobian(dx,u),x,xe),u,ue)));
+%Ac = double(vpa(subs(subs(jacobian(dx,x),x,xe),u,ue)));
+%Bc = double(vpa(subs(subs(jacobian(dx,u),x,xe),u,ue)));
+
+Ac = double(vpa(subs(jacobian(dx,x),[x;u],[xe;ue])));
+Bc = double(vpa(subs(jacobian(dx,u),[x;u],[xe;ue])));
 end
 
 function P6(Ac, Bc)
@@ -149,23 +153,14 @@ function xdot = getRates(J, x, u, m, g)
     theta = x(4:6);
     v = x(7:9);
     w = x(10:12);
-    
-    
+   
     tau = [u(1); u(2); u(3)];
-    
     
     Rzz = Rz(cos(theta(1)),sin(theta(1)));
     Ryy = Ry(cos(theta(2)),sin(theta(2)));
     Rxx = Rx(cos(theta(3)),sin(theta(3)));
-    %Rzz = eul2rotm([theta(1) 0 0],'ZYX');
-    %Ryy = eul2rotm([0 theta(2) 0],'ZYX');
-    %Rxx = eul2rotm([0 0 theta(3)],'ZYX');
 
-    R1 = Rxx'*Ryy';
-    R2 = Rxx';
-    R3 = eye(3)';
-    
-    N = [R1*[0;0;1] R2*[0;1;0] R3*[1;0;0]]
+    N = [Rxx'*Ryy'*[0;0;1] Rxx'*[0;1;0] eye(3)*[1;0;0]];
     f = Rzz*Ryy*Rxx*[0;0;-u(4)]+[0;0;m*g];
     
     dq = v;

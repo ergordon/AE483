@@ -1,7 +1,7 @@
 function hw25
-clc; clear; 
-format long
-P1
+%clc; clear; 
+%format long
+P2
 end
 
 function P1()
@@ -162,15 +162,23 @@ x = x0;
 
 %%%%%%%%%%%%%%%%%%%%CHANGE THIS FUNCTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %-9*p^2 - 8 * p - 5*q - 9*r
+%%{
+for i = 1:tf/dt
+    ui = [-K*(xi-xe)+ue];
+    xdot = matlabFunction(xdot);
+    [t, x] = ode45(@(t,x) xdot(x(1), x(2),double(ui)),[0 dt], xi);
+    xi = x(end,:)';
+end
+xi
+%}
+%%{
 gdot = @(t,x,u) [x(2); -9*x(1).^2-8*x(1)-5*x(2)-9*u];
 while t<tf            
-    for i = 1:tf/dt
-            ui = [-K*(x-xe)+ue];
-    end
-    % integrate ODE's over the i'th sample interval
+    ui = [-K*(x-xe)+ue];
     [ti_interval, xi_interval] = ode45(@(t,x) gdot(t,x,double(ui)),[t,t+dt], x);
     x = [xi_interval(end,:)'];
     t = [ti_interval(end)];
 end
+%}
 disp(mat2str(x))
 end
