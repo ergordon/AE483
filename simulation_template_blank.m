@@ -1,19 +1,19 @@
 function simulation_template
 
     % Parameters (model)
-    m = 0.41097000;
-    g = 9.81000000;
-    J = [0.00411000 0.00000000 0.00000000; 0.00000000 0.00407000 0.00000000; 0.00000000 0.00000000 0.00623000];
-    sigmamax = 1000.00000000;
-    kF = 0.00001000;
-    kM = 0.00000010;
-    L = 0.40000000;
-    dt = 0.04000000;
+    g = 10;                 % acceleration of gravity
+    m = 1;                  % mass
+    J = diag([1, 1, 1]);    % moment of inertia matrix in body frame
+    sigmamax = 1e3;         % maximum spin rate of each rotor
+    kF = 1e-5;              % aerodynamic force coefficient
+    kM = 1e-5;              % aerodynamic torque coefficient
+    L = 1;                  % spar length
+    dt = 0.1;               % sample time
     
     % Parameters (simulation)
-    x0 = [-0.80; 0.30; -1.40; -0.70; 0.80; -0.90; -0.20; 0.70; 0.00; 0.70; 0.90; 0.70];
-    t0 = 0.00;
-    t1 = 0.28;
+    x0 = zeros(12, 1);      % initial state
+    t0 = 0;                 % initial time
+    t1 = 1;                 % final time
 
     % Control policy
     xe = zeros(12, 1);
