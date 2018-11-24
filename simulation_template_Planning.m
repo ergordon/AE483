@@ -1,25 +1,25 @@
 function simulation_template
-% Parameters (method of collision avoidance)
-params.r = 1.00;
-params.k_att = 1.48;
-params.b_att = 1.03;
-params.k_rep = 1.13;
-params.b_rep = 0.57;
-params.k_des = 0.02;
-params.b_des = 0.13;
+    % Parameters (method of collision avoidance)
+    params.r = 1.00;
+    params.k_att = 1.48;
+    params.b_att = 1.03;
+    params.k_rep = 1.13;
+    params.b_rep = 0.57;
+    params.k_des = 0.02;
+    params.b_des = 0.13;
 
-% Parameters (simulation)
-params.t0 = 0.00;
-params.t1 = 6.00;
-params.dt = 0.05;
+    % Parameters (simulation)
+    params.t0 = 0.00;
+    params.t1 = 6.00;
+    params.dt = 0.05;
 
-% Start and goal position
-o_start = [-4.56; 0.11; -3.54];
-o_goal = [4.64; -0.84; -2.58];
+    % Start and goal position
+    o_start = [-4.56; 0.11; -3.54];
+    o_goal = [4.64; -0.84; -2.58];
 
-% Obstacles
-obst = {};
-obst = AddObstacle_Sphere(obst, [-3.13; 0.14; -0.18], 0.31);
+    % Obstacles
+    obst = {};
+    obst = AddObstacle_Sphere(obst, [-3.13; 0.14; -0.18], 0.31);
 
     %%%%%%%%%%%%%%%%%%%%
     %
@@ -63,82 +63,49 @@ obst = AddObstacle_Sphere(obst, [-3.13; 0.14; -0.18], 0.31);
         data.obst{:, end+1} = obst;
 
     end
-    
-    % Comment the next line to suppress the visualization (it's not
-    % necessary to solve this problem)
-    %visualize(data, params);
 
+    %visualize(data, params);
 end
 
 function o_desired = planner(o_desired, o_goal, obst, params)
 
-% Rename o_desired, o_goal, and the radius of the bounding volume for convenience
- q = o_desired;
- q_goal = o_goal;
- r = params.r;
+    % Rename o_desired, o_goal, and the radius of the bounding volume for convenience
+    q = o_desired;
+    q_goal = o_goal;
+    r = params.r;
 
- %{
- % Get attractive part of gradient
- % if ( ... )
- % gradf = ...
- % else
- % gradf = ...
- 
-% params.k_att = 1;
-% params.b_att = 1;
-% params.k_rep = 1;
-% params.b_rep = 1;
-% params.k_des = 1;
-% params.b_des = 1;
- %}
- 
-  % Get attractive part of gradient
- if ( norm(q-q_goal) <= params.b_att )
-    gradf = params.k_att*(q-q_goal);
- else
-    gradf = params.k_att*params.b_att*(q-q_goal)/norm(q-q_goal);
- end
- 
- % Get repulsive part of gradient
- for i=1:length(obst)
-     % Get center and radius of i'th spherical obstacle
-     p = obst{i}.p;
-     s = obst{i}.s;
-     %{
-     % Compute distance and gradient of distance to this obstacle
-     % d = ...
-     % dgrad = ...
-     % Compute repulsive gradient for this obstacle and add it to total gradient
-     % if ( ... )
-     % gradf = gradf + ...
-     %}
-     %Compute distance and gradient of distance to this obstacle
-     d = norm(q-p)-(s+r);
-     dgrad = (q-p)/norm(q-p);
-     %Compute repulsive gradient for this obstacle and add it to total gradient
-    if ( d <= params.b_rep )
-        gradf = gradf + params.k_rep*(1/d - 1/params.b_rep)*(-1)/d^2*dgrad;
+    % Get attractive part of gradient
+    if ( norm(q-q_goal) <= params.b_att )
+        gradf = params.k_att*(q-q_goal);
+    else
+        gradf = params.k_att*params.b_att*(q-q_goal)/norm(q-q_goal);
     end
- end
 
- % Take a step
- % if ( ... )
+    % Get repulsive part of gradient
+    for i=1:length(obst)
+        % Get center and radius of i'th spherical obstacle
+        p = obst{i}.p;
+        s = obst{i}.s;
 
- % q = ...
- % else
- % q = ...
+        % Compute distance and gradient of distance to this obstacle
+        d = norm(q-p)-(s+r);
+        dgrad = (q-p)/norm(q-p);
+        
+        % Compute repulsive gradient for this obstacle and add it to total gradient
+        if ( d <= params.b_rep )
+            gradf = gradf + params.k_rep*(1/d - 1/params.b_rep)*(-1)/d^2*dgrad;
+        end
+    end
 
-  % Take a step
- if ( params.k_des*gradf <= params.b_des )
-    q = q - params.k_des*gradf;
- else
-    q = q - params.b_des*(gradf/norm(gradf));
- end
- 
- % Recover o_desired
+    % Take a step
+    if ( params.k_des*gradf <= params.b_des )
+        q = q - params.k_des*gradf;
+    else
+        q = q - params.b_des*(gradf/norm(gradf));
+    end
 
+    % Recover o_desired
     o_desired = q;
-    
     mat2str(q)
 end
 
@@ -146,10 +113,7 @@ function obst = AddObstacle_Sphere(obst, p, s)
     obst{end+1} = struct('type', 1, 'p', p, 's', s);
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% CODE TO VISUALIZE RESULTS (CAN BE IGNORED)
-
+%% Visualization Code
 function visualize(data, params)
     
     fig = [];
@@ -276,7 +240,3 @@ function bubble = DrawBubble(bubble,o,r,x,y,z,c,a)
         set(bubble,'xdata',o(1)+r*x,'ydata',o(2)+r*y,'zdata',o(3)+r*z);
     end
 end
-
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-

@@ -1,4 +1,4 @@
-function hw22
+function HW22
 clc;
 %p221;
 %p222;

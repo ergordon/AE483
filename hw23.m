@@ -1,4 +1,4 @@
-function hw23
+function HW23
 clc;
 
 %p231;
