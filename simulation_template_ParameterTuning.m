@@ -52,16 +52,13 @@ function simulation_template
     b_rep_max = 10;
     
     b_rep_bounds = [b_rep_min b_rep_max];
-    
-    res = 1;
-    while (res == 1)
-        
+
+    while 1
         % Use Bisection Method to compute b_rep 
         if abs(b_rep_bounds(2) - b_rep_bounds(1)) > 1e-10
             params.b_rep = 0.5*(b_rep_bounds(1)+b_rep_bounds(2));
-            res = 1;
         else
-            res = 0;
+            break
         end
 
         % Iterate over t1/dt sample intervals.
@@ -102,15 +99,13 @@ function simulation_template
     
     b_rep_bounds = [b_rep_min b_rep_max];
     
-    res = 1;
-    while (res == 1)
+    while 1
         
         % Use Bisection Method to compute b_rep
         if abs(b_rep_bounds(2) - b_rep_bounds(1)) > 1e-10
             params.b_rep = 0.5*(b_rep_bounds(1)+b_rep_bounds(2));
-            res = 1;
         else
-            res = 0;
+            break
         end
 
         % Iterate over t1/dt sample intervals.
@@ -151,15 +146,13 @@ function simulation_template
     
     b_rep_bounds = [b_rep_min b_rep_max];
     
-    res = 1;
-    while (res == 1)
+    while 1
     
         % Use Bisection Method to compute b_rep
         if abs(b_rep_bounds(2) - b_rep_bounds(1)) > 1e-10
             params.b_rep = 0.5*(b_rep_bounds(1)+b_rep_bounds(2));
-            res = 1;
         else
-            res = 0;
+            break
         end
 
         % Iterate over t1/dt sample intervals.
