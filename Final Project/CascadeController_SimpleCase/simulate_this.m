@@ -1,17 +1,20 @@
+function [params] = simulate_this()
 close all
 clear all
 clc
 
-% Initial conditions
-dt = (1/50);
-t0 = 0;
-t1 = 20;
+% Fetch Parameters
+params = GetParameters;
+o_des = params.odes;
+dt_inner = params.dt_inner;
+dt_outer = params.dt_outer;
+t0 = params.t0;
+t1 = params.t1;
+x0 = params.x0;
 
+
+% Initial conditions
 tspan=[t0 t1]; 
-dt_inner=0.001; 
-dt_outer=0.01;
-x0=zeros(12,1); 
-x0(1:3)=[0;0;-2];
 
 % Identify your EOM function, policy functions and a force disturbance. 
 eom=@(t,x,u) Quad_EOM(x,u);
@@ -29,7 +32,7 @@ toc
 
 odes = [];
 for i=1:length(T)
-    odes = [odes; [0 0 -1]];
+    odes = [odes; o_des];
 end
 
 %figure()
@@ -41,4 +44,3 @@ plot_basic(T,X',Ui_T,Ui,Uo_T,Uo)
 
 % Clear persistent variables
 clear functions
-

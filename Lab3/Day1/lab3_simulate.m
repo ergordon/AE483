@@ -21,7 +21,7 @@ function [t, o, theta, odes] = lab3_simulate
     % Initial time
     t0 = 0;
     
-    o0 = [0; 0; -2];
+    o0 = [0; -1; -2];
     theta0 = [0; 0; 0];
     v0 = [0; 0; 0];
     w0 = [0; 0; 0];
@@ -146,7 +146,7 @@ function [t, o, theta, odes] = lab3_simulate
     % Get position and orientation
     o = x(1:3, :);
     theta = x(4:6, :);
-
+lab3_visualize(t, o, theta, odes, 'test.mp4')
 end
 
 function xdot = h(t, x, u, g, m, J)
