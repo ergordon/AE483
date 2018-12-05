@@ -1,1 +1,0 @@
-mymath.o: mymath.c
